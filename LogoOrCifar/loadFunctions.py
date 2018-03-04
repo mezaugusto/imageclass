@@ -1,11 +1,11 @@
 from glob import glob
 from os import makedirs, getcwd
 from os.path import join, isdir
-from numpy import concatenate
-from pickle import load
-from numpy import array, zeros, ones, float32
+from numpy import array, zeros, ones, float32, concatenate
 from numpy.random import seed, shuffle, get_state, set_state
+from pickle import load, dump
 from sys import stdout
+
 
 seed(42)
 # Width and height of each image.
@@ -178,8 +178,25 @@ def loadAndCreateDataset(cifar_len, lld_len):
     print('Datasets Loaded, LLD Shape:', lld.shape, 'CIFAR Shape:', cifar.shape)
     return createDataset(cifar, lld)
 
+
 def createDirs(rel_path):
     save_dir = join(getcwd(), rel_path)
     if not isdir(save_dir):
         makedirs(save_dir)
     return save_dir
+
+
+def expandPickle():
+    for i in range(5):
+        with open('datasets/LLD/LLD_favicon_data_' + str(i) + '.pkl', 'rb') as f:
+            if i == 0:
+                icons = load(f, encoding="bytes")
+            else:
+                icons = concatenate((icons, load(f, encoding="bytes")))
+            print('File', i + 1, 'of 5 loaded')
+
+    step = 100 / len(icons)
+    for i, img in enumerate(icons):
+        with open('datasets/individuals/img_' + str(i), 'wb') as file:
+            dump(img, file)
+        stdout.write('\rProcessing {:2.2f}%'.format(step * (i + 1)))

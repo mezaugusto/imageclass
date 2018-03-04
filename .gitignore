@@ -5,6 +5,8 @@ __pycache__/
 
 # Other
 *.pickle
+*.conf
+
 datasets/
 results/
 saved_models/

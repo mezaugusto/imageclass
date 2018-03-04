@@ -6,12 +6,12 @@ from keras.utils import to_categorical
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Conv2D, MaxPooling2D
-from LoadFunctions import loadAndCreateDataset, createDirs
+from .loadFunctions import loadAndCreateDataset, createDirs
 from pickle import load, dump
 
 
 class LogoOrCifar:
-    def __init__(self, train_sz=150000, cifar_len=0, lld_len=0):
+    def __init__(self, train_sz=150000, cifar_len=0, lld_len=50000):
 
         self.cifar_len = cifar_len
         self.lld_len = lld_len
