@@ -9,7 +9,9 @@ from io import BytesIO
 from tempfile import NamedTemporaryFile
 
 
-def svg2array(bytestring, size=32, tran_color=255):
+def svg2array(bytestring=None, size=32, tran_color=255):
+    if bytestring is None:
+        return None
     f = NamedTemporaryFile()
     svg2png(bytestring=bytestring, write_to=f)
     img = Image.open(f)
@@ -41,7 +43,10 @@ class getSuggestions(Task):
         return self._img_emb
 
     def run(self, data):
-        self.img_emb.calculateDistances(svg2array(data))
+        arr = svg2array(data)
+        if arr is None:
+            return None
+        self.img_emb.calculateDistances(arr)
         return array2bytes(self.img_emb.viewCollageComparison(res_size=20))
 
 

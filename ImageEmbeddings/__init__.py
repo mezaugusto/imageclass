@@ -1,3 +1,6 @@
+from os import environ
+from warnings import simplefilter
+simplefilter(action='ignore', category=FutureWarning)  # h5py Future Warning
 from keras.models import load_model
 from keras import backend as K
 from numpy import zeros, uint8
@@ -7,6 +10,7 @@ from redis import StrictRedis
 from .distanceFunctions import euclideanDistance, cosineDistance
 key_name = 'lld_vectors'
 icons_path = 'datasets/individuals/'
+environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Tensorflow compiler Warning
 
 
 class ImageEmbeddings:
