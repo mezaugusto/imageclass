@@ -30,6 +30,12 @@ class ImageEmbeddings:
         self.layer_info = self.model.layers[layer].get_config()
         self.distances = None
 
+        self.icons = []
+        for i in range(5):
+            with open('datasets/LLD-icon/LLD-icon_data_' + str(i) + '.pkl', 'rb') as f:
+                self.icons.extend(load(f, encoding="bytes"))
+                print('File', i + 1, 'of 5 loaded')
+
         if not self.r.exists(self.key_name) or forceRecal:
             self.calculateVectors()
 
@@ -37,19 +43,13 @@ class ImageEmbeddings:
         self.inform('\nReady to compare images with model:', mdl_path,
                     ' Layer', layer, '- Name:', self.layer_info['name'])
 
-    def calculateVectors(self, length=-1):
-        icons = []
-        for i in range(5):
-            with open('datasets/LLD/LLD_favicon_data_' + str(i) + '.pkl', 'rb') as f:
-                icons.extend(load(f, encoding="bytes"))
-                print('File', i + 1, 'of 5 loaded')
-        icons = icons[:length]
-        in_size = len(icons)
+    def calculateVectors(self):
+        in_size = len(self.icons)
         print(in_size, 'icons loaded, calculating vectors.')
 
         self.r.delete(key_name)
         step = 100 / in_size
-        for i, icon in enumerate(icons):
+        for i, icon in enumerate(self.icons):
             vector = self.getOutputFrom(icon)
             self.r.rpush(key_name, dumps(vector))
             stdout.write('\r[IMG-EMB]\tCalculating Vectors {:2.2f}%'.format(step * (i + 1)))
@@ -62,7 +62,7 @@ class ImageEmbeddings:
             return enumerate(self.r.lrange(self.key_name, 0, -1))
         return enumerate(range(self.db_len))
 
-    def calculateDistances(self, img_array, use_euc_dist=False):
+    def calculateDistances(self, img_array, use_euc_dist=True):
         img_vector = self.getOutputFrom(img_array)
         self.inform('Image ready, now calculating distances')
 
@@ -90,5 +90,4 @@ class ImageEmbeddings:
         return coll
 
     def openImage(self, idx):
-        with open(self.ico_path + 'img_' + str(int(idx)), 'rb') as file:
-            return load(file)
+        return self.icons[int(idx)]
